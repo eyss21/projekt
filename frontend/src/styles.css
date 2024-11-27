@@ -1,0 +1,30 @@
+.vehicle-item {
+  margin-bottom: 20px;
+}
+
+.edit-button {
+  margin-left: 10px;
+}
+
+.vehicle-edit-form .button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ml-2 {
+  margin-left: 10px;
+}
+
+.vehicle-table {
+  margin-top: 20px;
+}
+
+.vehicle-table th, .vehicle-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.vehicle-table .edit-button {
+  margin: 0;
+}

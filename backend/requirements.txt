@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+databases
+sqlalchemy
+alembic
+ariadne
+psycopg2
+mysqlclient

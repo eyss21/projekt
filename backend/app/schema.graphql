@@ -1,0 +1,211 @@
+type User {
+  user_id: ID!
+  email: String!
+  phone_number: String
+  company_name: String
+  postal_code: String
+  city: String
+  street: String
+  first_name: String
+  last_name: String
+  user_type: String!
+  wallet: Wallet!
+}
+
+type Vehicle {
+  vehicle_id: ID!
+  model: String!
+  capacity: Int!
+  registration_number: String!
+  owner: User!
+}
+
+type Schedule {
+  schedule_id: ID!
+  vehicle: Vehicle!
+  stop: String!
+  arrival_time: String!
+  departure_time: String!
+  order_number: Int!
+  relation_id: Int
+  relation: Relation
+}
+
+type Relation {
+  relation_id: ID!
+  relation_name: String!
+  vehicle: Vehicle!
+  schedules: [Schedule!]!
+}
+
+type Order {
+  order_id: ID!
+  user: User!
+  relation: Relation!
+  start_stop: String!
+  end_stop: String!
+  departure_time: String!
+  arrival_time: String!
+  status: String!
+  size: String!
+  created_at: String!
+  driver: Driver
+  order_code: String!
+  pickup_code: String!
+  delivery_code: String!
+  status_history: [OrderStatusHistory!]!
+  deleted_by_user: Boolean!
+  deleted_by_carrier: Boolean!
+  price: Float!
+}
+
+type CarrierStats {
+  completedOrders: Int!
+  totalEarnings: Float!
+  newOrders: Int! 
+}
+
+type Wallet {
+  wallet_id: ID!
+  balance: Float!
+  user: User!
+}
+
+type Driver {
+  driver_id: ID!
+  first_name: String!
+  last_name: String!
+  driver_id_code: String!
+  pin_code: String!
+  owner: User!
+}
+
+type Stop {
+  stop: String!
+  order_number: Int!
+}
+
+type ShipmentProblem {
+  problem_id: ID!
+  order: Order!
+  user: User!
+  description: String
+  status: String!
+  created_at: String!
+}
+
+type OrderStatusHistory {
+  change_id: ID!
+  order_id: ID!
+  status: String!
+  changed_at: String!
+}
+
+type Query {
+  getUserProfile(email: String!, user_type: String!): User
+  getUserVehicles(owner_id: Int!): [Vehicle]
+  getVehicleSchedules(vehicle_id: Int!, relation_id: Int): [Schedule]
+  getVehicleRelations(vehicle_id: Int!): [Relation]
+  getUserOrders(user_id: Int!): [Order]
+  getCarrierStats(owner_id: Int!): CarrierStats
+  getAllStops: [String]
+  getAvailableStops(startStop: String!): [Stop]
+  getAvailableCourses(startStop: String!, endStop: String!, size: String!, todayDelivery: Boolean!): [AvailableCourse]
+  getCarrierOrders(owner_id: Int!): [Order]
+  getAllUsers: [User]
+  getCarrierDrivers(owner_id: Int!): [Driver]
+  trackShipment(order_code: String!): Order
+  getDriverProfile(driver_id: Int!): Driver
+  getDriverOrders(driver_id: Int!): [Order]
+  getAllOrders: [Order]
+  getUserShipmentProblems(user_id: Int!): [ShipmentProblem]
+  getInterventionOrders: [InterventionOrder!]
+  getPriceList(relation_id: ID!): PriceList
+  getUserRelations(owner_id: Int!): [Relation!]!
+}
+
+type Mutation {
+  registerCarrier(email: String!, password: String!, company_name: String!, postal_code: String!, city: String!, street: String!, phoneNumber: String): RegisterResponse
+  loginCarrier(email: String!, password: String!): LoginResponse
+  loginAdmin(email: String!, password: String!): LoginResponse
+  deleteUser(email: String!, user_type: String!): String
+  updateCustomerProfile(email: String!, new_email: String!, first_name: String!, last_name: String!, phone_number: String): User
+  updateCarrierProfile(email: String!, new_email: String!, company_name: String!, postal_code: String!, city: String!, street: String!, phone_number: String): User
+  updatePassword(email: String!, oldPassword: String!, newPassword: String!, user_type: String!): String
+  updateVehicle(vehicle_id: Int!, model: String!, capacity: Int!, registration_number: String!): Vehicle
+  addVehicle(model: String!, capacity: Int!, registration_number: String!, owner_id: Int!): Vehicle
+  addSchedule(vehicle_id: Int!, stop: String!, arrival_time: String!, departure_time: String!, relation_id: Int): Schedule
+  updateSchedule(schedule_id: Int!, stop: String!, arrival_time: String!, departure_time: String!): Schedule
+  createOrder(user_id: Int!, relation_id: Int!, size: String!, start_stop: String!, end_stop: String!, price: Float!, today_delivery: Boolean): Order
+  registerCustomer(firstName: String!, lastName: String!, email: String!, password: String!, phoneNumber: String): RegisterResponse
+  loginCustomer(email: String!, password: String!): LoginResponse
+  updateUserFunds(user_id: ID!, new_balance: Float!): Wallet
+  updateUser(user_id: ID!, email: String!, user_type: String!, company_name: String, postal_code: String, city: String, street: String, first_name: String, last_name: String, phone_number: String): User
+  createDriver(first_name: String!, last_name: String!, pin_code: String!, owner_id: Int!): Driver
+  deleteDriver(driver_id: Int!): String
+  loginDriver(id: String!, pin: String!): LoginResponse
+  changeDriverPin(driver_id: Int!, new_pin_code: String!): ChangePinResponse
+  assignDriverToOrder(order_id: ID!, driver_id: ID!): Order
+  acceptShipment(order_code: String!, pickup_code: String!): Order
+  deliverShipment(order_code: String!, delivery_code: String!): Order
+  deleteVehicle(vehicle_id: Int!): String
+  deleteSchedule(schedule_id: Int!): String
+  deleteAllSchedules(relation_id: Int!): Boolean
+  updateScheduleOrder(schedule_id: Int!, new_order_number: Int!): Schedule
+  deleteRelation(vehicle_id: Int!, relation_id: Int!): String!
+  createRelation(vehicle_id: Int!, relation_name: String!): Relation!
+  assignScheduleToRelation(schedule_id: Int!, relation_id: Int!): Schedule
+  addShipmentProblem(order_id: Int!, user_id: Int!, description: String!): ShipmentProblem
+  deleteShipmentProblem(problem_id: ID!): String
+  deleteShipmentHistory(order_id: Int!): String
+  addOrderStatusHistory(order_id: Int!, status: String!): OrderStatusHistory
+  removeOrderFromUserHistory(order_id: Int!, user_id: Int!): String
+  removeOrderFromCarrierHistory(order_id: Int!, carrier_id: Int!): String
+  updateOrderDetails(order_id: ID!, pickup_code: String!, delivery_code: String!, deleted_by_user: Boolean!, deleted_by_carrier: Boolean!, status: String!): Order
+  createOrUpdatePriceList(relation_id: ID!, base_price: Float!, price_per_stop: Float!): PriceList
+}
+
+type RegisterResponse {
+  message: String!
+  user_id: ID!
+  email: String!
+  token: String!
+}
+
+type LoginResponse {
+  message: String!
+  user_id: ID
+  email: String!
+  token: String!
+}
+
+type AvailableCourse {
+  schedule_id: ID!
+  relation_id: Int!
+  vehicle_id: ID!
+  company_name: String!
+  start_stop: String!
+  end_stop: String!
+  departure_time: String!
+  arrival_time: String!
+  total_price: Float!
+  today_delivery: Boolean
+}
+
+type ChangePinResponse {
+  message: String!
+}
+
+type InterventionOrder {
+  order: Order!
+  problem: ShipmentProblem!
+  customer: User!
+  carrier: User!
+}
+
+type PriceList {
+  relation_id: ID!
+  base_price: Float!
+  price_per_stop: Float!
+  relation: Relation!
+}
